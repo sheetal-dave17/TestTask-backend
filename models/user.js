@@ -1,34 +1,21 @@
-'use strict';
-
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const UsersSchema = new Schema(
-    {
-        first_name: {
-            type: String
-        },
-        last_name: {
-            type: String
-        },
-        email: {
-            type: String
-        },
-        profile_url: {
-            type: String
-        },
+const schema = new Schema({
+    username: { type: String, unique: true, required: true },
+    hash: { type: String, required: true },
+    firstName: { type: String },
+    lastName: { type: String},
+    createdDate: { type: Date, default: Date.now }
+});
 
-    },
-    {
-        timestamps: {
-            createdAt: 'created_at',
-            updatedAt: 'updated_at'
-        },
-        collection: 'Users'
+schema.set('toJSON', {
+    virtuals: true,
+    versionKey: false,
+    transform: function (doc, ret) {
+        delete ret._id;
+        delete ret.hash;
     }
-);
+});
 
-/**
- * Defines the schema for users
- */
-module.exports = mongoose.model('Users', UsersSchema);
+module.exports = mongoose.model('User', schema);

@@ -3,9 +3,23 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 const morgan = require('morgan');
-const {logger} = require('./helpers');
+const cors = require('cors');
+const config = require('./config.json');
 
-const { login } = require('./api/user');
+const mongoose = require('mongoose');
+mongoose.plugin((schema) => { schema.options.usePushEach = true; });
+mongoose.Promise = global.Promise;
+
+mongoose.connect(config.mongo.database_host, config.mongo.options);
+mongoose.connection.on('error', (error) => {
+        logger.error('MongoDB connection error', error);
+        process.exit(1);
+    }
+);
+
+const {logger, errorHandler, jwt} = require('./helpers');
+
+const { login, register } = require('./api/user');
 
 const app = express();
 
@@ -13,11 +27,20 @@ const app = express();
 app.use(morgan('combined'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json({type: 'application/json'}));
+app.use(cors());
 
-// routes
+// use JWT auth to secure the api
+app.use(jwt());
+
+// api routes
 app.post('/login', login);
+app.post('/register', register);
 
-const port = process.env.PORT || 3000;
+
+// global error handler
+app.use(errorHandler);
+
+const port = config.port || 3000;
 app.listen(port, () => {
     logger.info(`Starting Watchtower on  port ${port}`);
 });
