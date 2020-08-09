@@ -29,3 +29,6 @@ export_var.sh
 
 # package.lock
 package-lock.json
+
+
+/uploads
