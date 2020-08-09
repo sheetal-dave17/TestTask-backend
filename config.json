@@ -1,7 +1,7 @@
 {
     "port": 3000,
     "mongo": {
-        "database_host": "mongodb://localhost:27017/test-task-user",
+        "database_host": "mongodb://localhost:27017/userDB",
         "options": {
             "useCreateIndex": true,
             "useNewUrlParser": true,

@@ -6,7 +6,7 @@ const schema = new Schema({
     hash: { type: String, required: true },
     firstName: { type: String },
     lastName: { type: String},
-    Phone: { type: Number},
+    phone: { type: Number},
     Profile: {type: String},
     createdDate: { type: Date, default: Date.now }
 });

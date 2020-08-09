@@ -75,9 +75,11 @@ exports.login = async (req, res) => {
 exports.updateProfileData = async (req, res) => {
     try {
         const userParam = req.body;
-        const fileName = req.file.filename + '.' + (req.file.mimetype).split('/')[1];
-        userParam.profile = fileName;
-        req.file.path = 'uploads\\' + fileName;
+        if(req.file){
+            const fileName = req.file.filename + '.' + (req.file.mimetype).split('/')[1];
+            userParam.profile = fileName;
+            req.file.path = 'uploads\\' + fileName;
+        }
         let user = await User.findOne({ email: userParam.email });
         Object.assign(user, userParam);
         // save user
@@ -96,3 +98,29 @@ exports.updateProfileData = async (req, res) => {
                 message: 'something went wrong' });
     }
 };
+
+// get user info
+exports.getUserData = async (req, res) => {
+    try {
+        const email = req.params.email;
+        let user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json(
+                {
+                    status: 'error',
+                    message: `User does not exists in the system with email [${email}]`
+                });
+
+        }
+
+        return res.status(200).json(user.toJSON());
+    } catch (error) {
+        return res.status(500).json(
+            {
+                status: 'error',
+                error: error,
+                message: 'something went wrong' });
+    }
+};
+
+

@@ -6,10 +6,15 @@ const morgan = require('morgan');
 const cors = require('cors');
 const multer = require('multer');
 const path = require('path')
+const fs = require('fs');
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
-        cb(null, 'uploads/');
+        const dir = __dirname + '/upload';
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir);
+        }
+        cb(null, dir);
     },
 
     // By default, multer removes file extensions so let's add them back
@@ -34,7 +39,7 @@ mongoose.connection.on('error', (error) => {
 
 const {logger, errorHandler, jwt} = require('./helpers');
 
-const { login, register, updateProfileData} = require('./api/user');
+const { login, register, updateProfileData, getUserData} = require('./api/user');
 
 const app = express();
 
@@ -44,6 +49,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json({type: 'application/json' , limit: '50mb'}));
 app.use(cors());
 app.use(express.static(__dirname + '/public'));
+
 // use JWT auth to secure the api
 app.use(jwt());
 
@@ -51,6 +57,7 @@ app.use(jwt());
 app.post('/login', login);
 app.post('/register', register);
 app.put('/profile', upload.single('profile'), updateProfileData);
+app.get('/user/:email', getUserData);
 
 
 // global error handler
